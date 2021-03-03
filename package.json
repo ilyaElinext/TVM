@@ -1,0 +1,20 @@
+{
+  "name": "electron-auto-update-example",
+  "version": "1.0.1",
+  "description": "",
+  "main": "main.js",
+    "repository": {
+    "type" : "git",
+    "url" : "https://github.com/ilyaElinext/TVM.git"
+  },
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^12.0.0",
+    "electron-builder": "^22.10.5"
+  }
+}
