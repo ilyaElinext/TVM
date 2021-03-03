@@ -1,7 +1,8 @@
 {
-  "name": "electron-auto-update-example",
-  "version": "1.0.5",
-  "description": "",
+  "name": "tvm.ilya.ya",
+  "version": "1.0.7",
+  "description": "tvm",
+  "author": "iyasiuk@elinext.com",
   "main": "main.js",
   "repository": {
     "type": "git",
@@ -12,6 +13,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "electron-builder build --win --publish never",
     "deploy": "electron-builder build --win --publish always"
+  },
+  "build": {
+    "win": {
+      "target": "nsis",
+      "icon": "icon.png",
+      "legalTrademarks": "flowbird"
+    }
   },
   "author": "",
   "license": "ISC",
