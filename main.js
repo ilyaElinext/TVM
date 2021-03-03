@@ -5,8 +5,9 @@ let mainWindow;
 
 function createWindow () {
   mainWindow = new BrowserWindow({
-    width: 400,
-    height: 400,
+    width: 800,
+    height: 800,
+    show : false, 
     webPreferences: {
       nodeIntegration: true,
     },
@@ -16,8 +17,14 @@ function createWindow () {
     mainWindow = null;
   });
   mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+    // setTimeout(()=>{
+    //   mainWindow.close();
+    // }, 2000)
     autoUpdater.checkForUpdatesAndNotify();
-
+  });
+  mainWindow.on("maximize", () => {
+    mainWindow.close();
   });
 }
 
