@@ -28,6 +28,8 @@
 <body>
   <h1>Electron Auto Update Example</h1>
   <p id="version"></p>
+  <hr />
+  <p>TVM 0.0.1</p>
   <div id="notification" class="hidden">
     <p id="message"></p>
     <button id="close-button" onClick="closeNotification()">
@@ -35,8 +37,7 @@
     </button>
     <button id="restart-button" onClick="restartApp()" class="hidden">
       Restart
-    </button>
-    <p>TVM 0.0.1</p>
+    </button>   
   </div>
   <script>
     const { ipcRenderer } = require('electron');
