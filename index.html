@@ -26,10 +26,10 @@
   </style>
 </head>
 <body>
-  <h1>Electron Auto Update Example</h1>
+  <h1>TVM</h1>
   <p id="version"></p>
   <hr />
-  <p>TVM 0.0.4.2</p>
+  <p>TVM 0.0.11</p>
   <div id="notification" class="hidden">
     <p id="message"></p>
     <button id="close-button" onClick="closeNotification()">
@@ -40,22 +40,30 @@
     </button>   
   </div>
   <script>
+    const axios = require('axios');
     const { ipcRenderer } = require('electron');
     const version = document.getElementById('version');
     const notification = document.getElementById('notification');
     const message = document.getElementById('message');
     const restartButton = document.getElementById('restart-button');
     
+    let globalVersion;
+    let timeout;
+    let isProgress = false;
+
     ipcRenderer.send('app_version');
     ipcRenderer.on('app_version', (event, arg) => {
       ipcRenderer.removeAllListeners('app_version');
       version.innerText = 'Version ' + arg.version;
+      globalVersion = arg.version;
     });
 
     ipcRenderer.on('update_available', () => {
       ipcRenderer.removeAllListeners('update_available');
       message.innerText = 'A new update is available. Downloading now...';
       notification.classList.remove('hidden');
+      isProgress = true;
+      timeout && clearInterval(timeout);
     });
 
     ipcRenderer.on('update_downloaded', () => {
@@ -63,14 +71,83 @@
       message.innerText = 'Update Downloaded. It will be installed on restart. Restart now?';
       restartButton.classList.remove('hidden');
       notification.classList.remove('hidden');
+      setTimeout(()=>{
+        ipcRenderer.send('restart_app');
+      }, 1000)
     });
 
     function closeNotification() {
       notification.classList.add('hidden');
+      timeout && clearTimeout(timeout);
     }
     
     function restartApp() {
       ipcRenderer.send('restart_app');
     }
+    timeout = setInterval(() =>{
+        axios.get('https://guarded-reaches-84708.herokuapp.com/version')
+          .then(function (response) {
+            // handle success
+            const apiVersion = response.data.version;
+            if(!isProgress && globalVersion && versionCompare(apiVersion, globalVersion)){
+                ipcRenderer.send('relaunch_app');
+            }
+          })
+          .catch(function (error) {
+            // handle error
+            console.log(error);
+          })
+          .then(function () {
+            // always executed
+          });
+    }, 30*1000)
+
+    function versionCompare(v1, v2, options) {
+        var lexicographical = options && options.lexicographical,
+            zeroExtend = options && options.zeroExtend,
+            v1parts = v1.split('.'),
+            v2parts = v2.split('.');
+
+        function isValidPart(x) {
+            return (lexicographical ? /^\d+[A-Za-z]*$/ : /^\d+$/).test(x);
+        }
+
+        if (!v1parts.every(isValidPart) || !v2parts.every(isValidPart)) {
+            return NaN;
+        }
+
+        if (zeroExtend) {
+            while (v1parts.length < v2parts.length) v1parts.push("0");
+            while (v2parts.length < v1parts.length) v2parts.push("0");
+        }
+
+        if (!lexicographical) {
+            v1parts = v1parts.map(Number);
+            v2parts = v2parts.map(Number);
+        }
+
+        for (var i = 0; i < v1parts.length; ++i) {
+            if (v2parts.length == i) {
+                return true;
+            }
+
+            if (v1parts[i] == v2parts[i]) {
+                continue;
+            }
+            else if (v1parts[i] > v2parts[i]) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        if (v1parts.length != v2parts.length) {
+            return false;
+        }
+
+        return 0;
+    }
   </script>
+  <!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
 </body>
